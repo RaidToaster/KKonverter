@@ -119,7 +119,7 @@ func (a *AppUI) selectOutputDir() {
 }
 
 func (a *AppUI) addFiles() {
-	a.showCustomFileOpen(func(files fyne.URIReadCloser, err error) {
+	dialog.ShowFileOpen(func(files fyne.URIReadCloser, err error) {
 		if err != nil {
 			dialog.ShowError(err, a.window)
 			return
@@ -130,19 +130,6 @@ func (a *AppUI) addFiles() {
 		a.fileList = append(a.fileList, files.URI().Path())
 		a.fileListWidget.Refresh()
 	}, a.window)
-}
-
-func (a *AppUI) showCustomFileOpen(callback func(fyne.URIReadCloser, error), parent fyne.Window) {
-	// Placeholder for custom file dialog content
-	content := container.NewVBox(
-		widget.NewLabel("Custom File Open Dialog"),
-		widget.NewButton("Close", func() {
-			// This will be replaced with actual file selection logic
-		}),
-	)
-
-	d := dialog.NewCustom("Open File", "Cancel", content, parent)
-	d.Show()
 }
 
 func (a *AppUI) convertFiles() {
