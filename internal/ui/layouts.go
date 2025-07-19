@@ -57,7 +57,7 @@ func NewAppUI() (*AppUI, string) {
 			o.(*widget.Label).SetText(ui.fileList[i])
 		},
 	)
-	ui.outputFormatSelect = widget.NewSelect([]string{".docx", ".pdf", ".mp4", ".mp3", ".jpg", ".jpeg", ".png"}, nil)
+	ui.outputFormatSelect = widget.NewSelect([]string{}, nil)
 	ui.outputDirEntry = widget.NewEntry()
 	ui.outputDirEntry.SetText(".") // Default to current directory
 	ui.outputDirButton = widget.NewButton("Browse...", ui.selectOutputDir)
@@ -86,6 +86,14 @@ func NewAppUI() (*AppUI, string) {
 
 func (a *AppUI) LoadUI(converters map[string]converter.Converter) {
 	a.converters = converters
+
+	var outputFormats []string
+	for ext := range converters {
+		outputFormats = append(outputFormats, ext)
+	}
+	a.outputFormatSelect.Options = outputFormats
+	a.outputFormatSelect.SetSelectedIndex(0)
+
 	addFileButton := widget.NewButton("Add Files", a.addFiles)
 
 	outputDirContainer := container.NewBorder(
