@@ -13,11 +13,12 @@ func (c *ImageConverter) Convert(inputFile, outputFile string) error {
 	inputExt := strings.ToLower(getFileExtension(inputFile))
 	outputExt := strings.ToLower(getFileExtension(outputFile))
 
-	if inputExt == "jpg" || inputExt == "jpeg" {
+	switch inputExt {
+	case "jpg", "jpeg":
 		if outputExt == "png" {
 			return c.jpegToPng(inputFile, outputFile)
 		}
-	} else if inputExt == "png" {
+	case "png":
 		if outputExt == "jpg" || outputExt == "jpeg" {
 			return c.pngToJpeg(inputFile, outputFile)
 		}
