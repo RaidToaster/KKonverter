@@ -23,12 +23,13 @@ type AppUI struct {
 	outputDirEntry     *widget.Entry
 	outputDirButton    *widget.Button
 	presetSelect       *widget.Select
+	pdfEngineSelect    *widget.Select
 	progressBar        *widget.ProgressBar
 	convertButton      *widget.Button
 }
 
-func NewAppUI() *AppUI {
-	a := app.New()
+func NewAppUI() (*AppUI, string) {
+	a := app.NewWithID("com.kkonverter.app")
 	w := a.NewWindow("KKonverter")
 	w.SetMaster()
 
@@ -74,9 +75,13 @@ func NewAppUI() *AppUI {
 	ui.progressBar = widget.NewProgressBar()
 	ui.progressBar.Hide()
 
+	pdfEngines := []string{"default", "pdflatex", "xelatex", "lualatex", "wkhtmltopdf", "weasyprint", "prince"}
+	ui.pdfEngineSelect = widget.NewSelect(pdfEngines, nil)
+	ui.pdfEngineSelect.SetSelected("default")
+
 	ui.convertButton = widget.NewButton("Convert All", ui.convertFiles)
 
-	return ui
+	return ui, ui.pdfEngineSelect.Selected
 }
 
 func (a *AppUI) LoadUI(converters map[string]converter.Converter) {
@@ -97,6 +102,8 @@ func (a *AppUI) LoadUI(converters map[string]converter.Converter) {
 		a.outputFormatSelect,
 		widget.NewLabel("Preset:"),
 		a.presetSelect,
+		widget.NewLabel("PDF Engine:"),
+		a.pdfEngineSelect,
 		outputDirContainer,
 		a.progressBar,
 		a.convertButton,
