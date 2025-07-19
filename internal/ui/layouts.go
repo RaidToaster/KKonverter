@@ -57,7 +57,7 @@ func NewAppUI() (*AppUI, string) {
 			o.(*widget.Label).SetText(ui.fileList[i])
 		},
 	)
-	ui.outputFormatSelect = widget.NewSelect([]string{".docx", ".pdf", ".mp4", ".mp3"}, nil)
+	ui.outputFormatSelect = widget.NewSelect([]string{".docx", ".pdf", ".mp4", ".mp3", ".jpg", ".jpeg", ".png"}, nil)
 	ui.outputDirEntry = widget.NewEntry()
 	ui.outputDirEntry.SetText(".") // Default to current directory
 	ui.outputDirButton = widget.NewButton("Browse...", ui.selectOutputDir)
