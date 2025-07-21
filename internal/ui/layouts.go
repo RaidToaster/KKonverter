@@ -32,6 +32,7 @@ func NewAppUI() (*AppUI, string) {
 	a := app.NewWithID("com.kkonverter.app")
 	w := a.NewWindow("KKonverter")
 	w.SetMaster()
+	w.Resize(fyne.NewSize(800, 600))
 
 	ui := &AppUI{
 		app:    a,
@@ -51,10 +52,17 @@ func NewAppUI() (*AppUI, string) {
 			return len(ui.fileList)
 		},
 		func() fyne.CanvasObject {
-			return widget.NewLabel("template")
+			return container.NewBorder(nil, nil, nil, widget.NewButton("Remove", nil), widget.NewLabel("template"))
 		},
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*widget.Label).SetText(ui.fileList[i])
+			c := o.(*fyne.Container)
+			label := c.Objects[0].(*widget.Label)
+			label.SetText(filepath.Base(ui.fileList[i]))
+			button := c.Objects[1].(*widget.Button)
+			button.OnTapped = func() {
+				ui.fileList = append(ui.fileList[:i], ui.fileList[i+1:]...)
+				ui.fileListWidget.Refresh()
+			}
 		},
 	)
 	ui.outputFormatSelect = widget.NewSelect([]string{}, nil)
@@ -95,26 +103,35 @@ func (a *AppUI) LoadUI(converters map[string]converter.Converter) {
 	a.outputFormatSelect.SetSelectedIndex(0)
 
 	addFileButton := widget.NewButton("Add Files", a.addFiles)
+	removeAllButton := widget.NewButton("Remove All", a.removeAllFiles)
+	actionButtons := container.NewHBox(addFileButton, removeAllButton)
 
-	outputDirContainer := container.NewBorder(
-		nil, nil,
-		widget.NewLabel("Output Directory:"),
-		a.outputDirButton,
-		a.outputDirEntry,
+	outputDirWidget := container.NewBorder(nil, nil, nil, a.outputDirButton, a.outputDirEntry)
+
+	options := widget.NewForm(
+		widget.NewFormItem("Output Format", a.outputFormatSelect),
+		widget.NewFormItem("Preset", a.presetSelect),
+		widget.NewFormItem("PDF Engine", a.pdfEngineSelect),
+		widget.NewFormItem("Output Directory", outputDirWidget),
 	)
 
-	content := container.NewVBox(
-		addFileButton,
-		a.fileListWidget,
-		widget.NewLabel("Output Format:"),
-		a.outputFormatSelect,
-		widget.NewLabel("Preset:"),
-		a.presetSelect,
-		widget.NewLabel("PDF Engine:"),
-		a.pdfEngineSelect,
-		outputDirContainer,
+	bottom := container.NewVBox(
+		options,
 		a.progressBar,
 		a.convertButton,
+	)
+
+	top := container.NewVBox(
+		actionButtons,
+		widget.NewSeparator(),
+	)
+
+	content := container.NewBorder(
+		top,
+		bottom,
+		nil,
+		nil,
+		a.fileListWidget,
 	)
 
 	a.window.SetContent(content)
@@ -145,6 +162,11 @@ func (a *AppUI) addFiles() {
 		a.fileList = append(a.fileList, files.URI().Path())
 		a.fileListWidget.Refresh()
 	}, a.window)
+}
+
+func (a *AppUI) removeAllFiles() {
+	a.fileList = []string{}
+	a.fileListWidget.Refresh()
 }
 
 func (a *AppUI) convertFiles() {
