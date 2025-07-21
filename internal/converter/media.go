@@ -6,7 +6,7 @@ type MediaConverter struct{}
 
 func (c *MediaConverter) Convert(inputFile, outputFile string) error {
 	return ffmpeg.Input(inputFile).
-		Output(outputFile).
+		Output(outputFile, ffmpeg.KwArgs{"preset": "ultrafast"}).
 		OverWriteOutput().
 		Run()
 }

@@ -16,9 +16,12 @@ func NewApp(pdfEngine string) *App {
 		".pdf":  &converter.DocumentConverter{PDFEngine: pdfEngine},
 		".mp4":  &converter.MediaConverter{},
 		".mp3":  &converter.MediaConverter{},
+		".mkv":  &converter.MediaConverter{},
+		".mov":  &converter.MediaConverter{},
 		".jpg":  &converter.ImageConverter{},
 		".jpeg": &converter.ImageConverter{},
 		".png":  &converter.ImageConverter{},
+		".gif":  &converter.ImageConverter{},
 	}
 
 	appUI, _ := ui.NewAppUI()

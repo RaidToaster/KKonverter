@@ -164,32 +164,36 @@ func (a *AppUI) convertFiles() {
 		outputDir = "."
 	}
 
+	a.convertButton.Disable()
 	a.progressBar.Show()
 	a.progressBar.SetValue(0)
 
-	totalFiles := float64(len(a.fileList))
-	for i, inputFile := range a.fileList {
-		baseName := filepath.Base(inputFile[0 : len(inputFile)-len(filepath.Ext(inputFile))])
-		outputFile := filepath.Join(outputDir, baseName+outputFormat)
+	go func() {
+		totalFiles := float64(len(a.fileList))
+		for i, inputFile := range a.fileList {
+			baseName := filepath.Base(inputFile[0 : len(inputFile)-len(filepath.Ext(inputFile))])
+			outputFile := filepath.Join(outputDir, baseName+outputFormat)
 
-		converter, ok := a.converters[filepath.Ext(inputFile)]
-		if !ok {
-			dialog.ShowError(fmt.Errorf("no converter found for %s files", filepath.Ext(inputFile)), a.window)
-			continue
+			converter, ok := a.converters[filepath.Ext(inputFile)]
+			if !ok {
+				dialog.ShowError(fmt.Errorf("no converter found for %s files", filepath.Ext(inputFile)), a.window)
+				continue
+			}
+
+			err := converter.Convert(inputFile, outputFile)
+			if err != nil {
+				dialog.ShowError(err, a.window)
+				continue
+			}
+			a.progressBar.SetValue(float64(i+1) / totalFiles)
 		}
 
-		err := converter.Convert(inputFile, outputFile)
-		if err != nil {
-			dialog.ShowError(err, a.window)
-			continue
-		}
-		a.progressBar.SetValue(float64(i+1) / totalFiles)
-	}
-
-	dialog.ShowInformation("Success", "All files converted successfully", a.window)
-	a.fileList = []string{}
-	a.fileListWidget.Refresh()
-	a.progressBar.Hide()
+		dialog.ShowInformation("Success", "All files converted successfully", a.window)
+		a.fileList = []string{}
+		a.fileListWidget.Refresh()
+		a.progressBar.Hide()
+		a.convertButton.Enable()
+	}()
 }
 
 func (a *AppUI) Run() {
