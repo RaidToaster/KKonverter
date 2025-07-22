@@ -1,6 +1,6 @@
 # KKonverter
 
-KKonverter is a cross-platform file conversion application built with Go and Fyne. It supports converting various document and media formats.
+A program i made cause i didn't want to go to random websites just to convert files (this is basically a ffmpeg & pandoc wrapper)
 
 ## Features
 
