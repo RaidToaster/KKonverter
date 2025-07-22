@@ -198,23 +198,31 @@ func (a *AppUI) convertFiles() {
 
 			converter, ok := a.converters[filepath.Ext(inputFile)]
 			if !ok {
-				dialog.ShowError(fmt.Errorf("no converter found for %s files", filepath.Ext(inputFile)), a.window)
+				fyne.DoAndWait(func() {
+					dialog.ShowError(fmt.Errorf("no converter found for %s files", filepath.Ext(inputFile)), a.window)
+				})
 				continue
 			}
 
 			err := converter.Convert(inputFile, outputFile)
 			if err != nil {
-				dialog.ShowError(err, a.window)
+				fyne.DoAndWait(func() {
+					dialog.ShowError(err, a.window)
+				})
 				continue
 			}
-			a.progressBar.SetValue(float64(i+1) / totalFiles)
+			fyne.DoAndWait(func() {
+				a.progressBar.SetValue(float64(i+1) / totalFiles)
+			})
 		}
 
-		dialog.ShowInformation("Success", "All files converted successfully", a.window)
-		a.fileList = []string{}
-		a.fileListWidget.Refresh()
-		a.progressBar.Hide()
-		a.convertButton.Enable()
+		fyne.DoAndWait(func() {
+			dialog.ShowInformation("Success", "All files converted successfully", a.window)
+			a.fileList = []string{}
+			a.fileListWidget.Refresh()
+			a.progressBar.Hide()
+			a.convertButton.Enable()
+		})
 	}()
 }
 
